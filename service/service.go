@@ -42,7 +42,7 @@ func startService(ctx context.Context, serviceName registry.ServiceName, host, p
 	}()
 
 	go func ()  {
-		fmt.Printf("%v Started. Press any key to stop\n", serviceName)
+		fmt.Printf("%v 服务已启动，按任意键暂停\n", serviceName)
 		var a string
 		fmt.Scanln(&a)
 		fmt.Println("应该注销服务2")

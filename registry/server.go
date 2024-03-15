@@ -107,7 +107,7 @@ func (s RegistryService) ServeHTTP(w http.ResponseWriter,r *http.Request) {
 			return
 		}
 		url := string(payload)
-		log.Printf("Removing %v", url)
+		log.Printf("服务下线 %v", url)
 		err = reg.remove(url)
 		if err != nil {
 			log.Println(err)

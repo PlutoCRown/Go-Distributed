@@ -16,26 +16,26 @@ func main() {
 	// 注册Log服务
 	host, port := "localhost", "4000"
 
-	serviceAddress := fmt.Sprintf("http://%s:%s", host, port) 
+	serviceAddress := fmt.Sprintf("http://%s:%s", host, port)
 
-	r := registry.Registeration {
-		ServiceName: "Log Service",
-		ServiceURL: serviceAddress,
-		RequiredService: make([]registry.ServiceName,0),
+	r := registry.Registeration{
+		ServiceName:      "Log Service",
+		ServiceURL:       serviceAddress,
+		RequiredService:  make([]registry.ServiceName, 0),
 		ServiceUpdateURL: serviceAddress + "/services",
 	}
-	ctx,err := service.Start(
+	ctx, err := service.Start(
 		context.Background(),
 		host,
 		port,
 		r,
-		log.RegisterHandles,
+		log.RegisterHandlers,
 	)
 
 	// ShutDown
 	if err != nil {
 		stlog.Fatalln(err)
 	}
-	<- ctx.Done()
+	<-ctx.Done()
 	fmt.Println("ShutDown")
 }

@@ -12,7 +12,7 @@ import (
 )
 
 func RegisterService(r Registeration) error {
-	serviceUpdateURL,err := url.Parse(r.ServiceUpdateURL)
+	serviceUpdateURL, err := url.Parse(r.ServiceUpdateURL)
 	if err != nil {
 		return err
 	}
@@ -38,7 +38,6 @@ func RegisterService(r Registeration) error {
 }
 
 type serviceUpdateHandler struct {
-
 }
 
 func (shu *serviceUpdateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -69,15 +68,14 @@ func ShutdownService(url string) error {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("fail to deregister %v", res.StatusCode)
+		return fmt.Errorf("服务下线失败 %v", res.StatusCode)
 	}
 	return nil
 }
 
-
 type providers struct {
 	service map[ServiceName][]string
-	mutex *sync.RWMutex
+	mutex   *sync.RWMutex
 }
 
 func (p *providers) Update(pat patch) {
@@ -96,8 +94,8 @@ func (p *providers) Update(pat patch) {
 			for i := range providerURLs {
 				if providerURLs[i] == pathcEntry.URL {
 					p.service[pathcEntry.Name] = append(
-						providerURLs[:i], 
-						providerURLs[i+1:]...
+						providerURLs[:i],
+						providerURLs[i+1:]...,
 					)
 				}
 			}
@@ -105,20 +103,20 @@ func (p *providers) Update(pat patch) {
 	}
 }
 
-func (p providers) get(name ServiceName) (string,error) {
-	providers,ok := p.service[name]
+func (p providers) get(name ServiceName) (string, error) {
+	providers, ok := p.service[name]
 	if !ok {
-		return "", fmt.Errorf("service %v not found", name)
+		return "", fmt.Errorf("找不到服务 %v", name)
 	}
 	idx := int(rand.Float32() * float32(len(providers)))
 	return providers[idx], nil
 }
 
-func GetProvider(name ServiceName) (string,error) {
+func GetProvider(name ServiceName) (string, error) {
 	return prov.get(name)
 }
 
-var prov = providers {
+var prov = providers{
 	service: make(map[ServiceName][]string),
-	mutex: new(sync.RWMutex),
+	mutex:   new(sync.RWMutex),
 }

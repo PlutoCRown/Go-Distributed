@@ -118,7 +118,7 @@ func (sh studentsHandler) toJSON(obj interface{}) ([]byte,error) {
 	enc := json.NewEncoder(&b)
 	err := enc.Encode(obj)
 	if err != nil {
-		return nil, fmt.Errorf("fail in grades/server")
+		return nil, fmt.Errorf("编码失败")
 	}
 	return b.Bytes(), nil
 }

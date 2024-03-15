@@ -9,8 +9,6 @@ import (
 )
 
 
-
-
 func SetClientLogger(ServiceURL string, clientService registry.ServiceName) {
 	stlog.SetPrefix(fmt.Sprintf("[%v] - ",clientService))
 	stlog.SetFlags(0)
@@ -28,7 +26,7 @@ func (cl clientLogger) Write(data []byte) (int,error) {
 		return 0, err
 	}
 	if res.StatusCode != http.StatusOK {
-		return 0, fmt.Errorf("fail to send log message: %d", data)
+		return 0, fmt.Errorf("发送Log信息失败: %d", data)
 	}
 	return len(data), nil
 }
