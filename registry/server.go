@@ -23,9 +23,51 @@ func (r *registry) add(reg Registeration) error {
 	r.registerations = append(r.registerations, reg)
 	r.mutex.Unlock()
 	err := r.sendRequiredServices(reg)
+	r.notity(patch{
+		Added: []patchEntry{
+			patchEntry{
+				Name: reg.ServiceName,
+				URL:  reg.ServiceURL,
+			},
+		},
+	})
 	return err
 }
 
+// 反向依赖处理：上下线时查找依赖的服务
+func (r registry) notity(fullPatch patch) {
+	r.mutex.RLock()
+	defer r.mutex.RUnlock()
+	for _, reg := range r.registerations {
+		go func(reg Registeration) {
+			for _, reqService := range reg.RequiredService {
+				p := patch{Added: []patchEntry{}, Removed: []patchEntry{}}
+				sendUpdate := false
+				for _, added := range fullPatch.Added {
+					if added.Name == reqService {
+						p.Added = append(p.Added, added)
+						sendUpdate = true
+					}
+				}
+				for _, removed := range fullPatch.Removed {
+					if removed.Name == reqService {
+						p.Removed = append(p.Removed, removed)
+						sendUpdate = true
+					}
+				}
+				if sendUpdate {
+					err := r.sendPatch(p, reg.ServiceUpdateURL)
+					if err != nil {
+						log.Println(err)
+						return
+					}
+				}
+			}
+		}(reg)
+	}
+}
+
+// 服务上线时主动查找
 func (r *registry) sendRequiredServices(reg Registeration) error {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
@@ -48,6 +90,7 @@ func (r *registry) sendRequiredServices(reg Registeration) error {
 	return nil
 }
 
+// 发送更新包到更新接口
 func (r registry) sendPatch(p patch, url string) error {
 	d, err := json.Marshal(p)
 	if err != nil {
@@ -63,6 +106,13 @@ func (r registry) sendPatch(p patch, url string) error {
 func (r *registry) remove(url string) error {
 	for i := range reg.registerations {
 		if reg.registerations[i].ServiceURL == url {
+			r.notity(patch{
+				Added: []patchEntry{},
+				Removed: []patchEntry{{
+					Name: r.registerations[i].ServiceName,
+					URL:  r.registerations[i].ServiceURL,
+				}},
+			})
 			r.mutex.Lock()
 			r.registerations = append(r.registerations[:i], r.registerations[i+1:]...)
 			r.mutex.Unlock()

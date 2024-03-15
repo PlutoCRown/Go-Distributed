@@ -32,6 +32,7 @@ func main() {
 	if err != nil {
 		stlog.Fatalln(err)
 	}
+
 	if logProvider, err := registry.GetProvider(registry.LogService); err == nil {
 		fmt.Printf("找到日志服务: %v", logProvider)
 		log.SetClientLogger(logProvider, r.ServiceName)

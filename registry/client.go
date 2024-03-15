@@ -53,6 +53,7 @@ func (shu *serviceUpdateHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	fmt.Printf("依赖服务状态更新 %v \n", p)
 	prov.Update(p)
 }
 

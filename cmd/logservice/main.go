@@ -22,7 +22,7 @@ func main() {
 		ServiceName:      "Log Service",
 		ServiceURL:       serviceAddress,
 		RequiredService:  make([]registry.ServiceName, 0),
-		ServiceUpdateURL: serviceAddress + "/services",
+		ServiceUpdateURL: serviceAddress + "/services", // 无用
 	}
 	ctx, err := service.Start(
 		context.Background(),
