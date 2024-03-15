@@ -8,9 +8,8 @@ import (
 	"net/http"
 )
 
-
 func SetClientLogger(ServiceURL string, clientService registry.ServiceName) {
-	stlog.SetPrefix(fmt.Sprintf("[%v] - ",clientService))
+	stlog.SetPrefix(fmt.Sprintf("[%v] - ", clientService))
 	stlog.SetFlags(0)
 	stlog.SetOutput(&clientLogger{url: ServiceURL})
 }
@@ -19,7 +18,7 @@ type clientLogger struct {
 	url string
 }
 
-func (cl clientLogger) Write(data []byte) (int,error) {
+func (cl clientLogger) Write(data []byte) (int, error) {
 	b := bytes.NewBuffer([]byte(data))
 	res, err := http.Post(cl.url+"/log", "application/json", b)
 	if err != nil {

@@ -16,19 +16,19 @@ func main() {
 	var srv http.Server
 	srv.Addr = ":" + registry.ServicePort
 
-	go func ()  {
+	go func() {
 		log.Println(srv.ListenAndServe())
 		cancel()
 	}()
 
-	go func ()  {
+	go func() {
 		fmt.Println("注册服务已启动")
 		var a string
 		fmt.Scanln(&a)
 		srv.Shutdown(ctx)
 		cancel()
 	}()
-	
-	<- ctx.Done()
+
+	<-ctx.Done()
 	fmt.Println("ShutDown")
 }

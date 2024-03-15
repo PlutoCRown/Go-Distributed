@@ -15,7 +15,7 @@ const ServiceURL = "http://localhost" + ":" + ServicePort + "/services"
 
 type registry struct {
 	registerations []Registeration
-	mutex	*sync.RWMutex
+	mutex          *sync.RWMutex
 }
 
 func (r *registry) add(reg Registeration) error {
@@ -31,12 +31,12 @@ func (r *registry) sendRequiredServices(reg Registeration) error {
 	defer r.mutex.RUnlock()
 
 	var p patch
-	for _,serviceReg := range r.registerations {
-		for _,reqService := range reg.RequiredService {
+	for _, serviceReg := range r.registerations {
+		for _, reqService := range reg.RequiredService {
 			if serviceReg.ServiceName == reqService {
-				p.Added = append(p.Added, patchEntry {
+				p.Added = append(p.Added, patchEntry{
 					Name: serviceReg.ServiceName,
-					URL: serviceReg.ServiceURL,
+					URL:  serviceReg.ServiceURL,
 				})
 			}
 		}
@@ -60,27 +60,27 @@ func (r registry) sendPatch(p patch, url string) error {
 	return nil
 }
 
-func(r *registry) remove(url string) error {
+func (r *registry) remove(url string) error {
 	for i := range reg.registerations {
 		if reg.registerations[i].ServiceURL == url {
 			r.mutex.Lock()
-			r.registerations = append(r.registerations[:i],r.registerations[i+1:]... )
+			r.registerations = append(r.registerations[:i], r.registerations[i+1:]...)
 			r.mutex.Unlock()
 			return nil
 		}
 	}
-	return fmt.Errorf("找不到服务 %v",url)
+	return fmt.Errorf("找不到服务 %v", url)
 }
 
 // already init
-var reg = registry {
+var reg = registry{
 	registerations: make([]Registeration, 0),
-	mutex: new(sync.RWMutex),
+	mutex:          new(sync.RWMutex),
 }
 
-type RegistryService struct {}
+type RegistryService struct{}
 
-func (s RegistryService) ServeHTTP(w http.ResponseWriter,r *http.Request) {
+func (s RegistryService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		dec := json.NewDecoder(r.Body)
@@ -91,16 +91,16 @@ func (s RegistryService) ServeHTTP(w http.ResponseWriter,r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		log.Printf("添加服务 %v 在 %v", r.ServiceName,r.ServiceURL)
+		log.Printf("添加服务 %v 在 %v", r.ServiceName, r.ServiceURL)
 		err = reg.add(r)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		
+
 	case http.MethodDelete:
-		payload,err := io.ReadAll(r.Body)
+		payload, err := io.ReadAll(r.Body)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)

@@ -6,30 +6,30 @@ import (
 )
 
 type Student struct {
-	ID int
+	ID        int
 	FirstName string
-	LastName string
-	Grades []Grade
+	LastName  string
+	Grades    []Grade
 }
 type Students []Student
 
 var (
-	students Students
+	students      Students
 	studentsMutex sync.Mutex
 )
 
 func (ss Students) GetByID(id int) (*Student, error) {
 	for i := range ss {
 		if ss[i].ID == id {
-			return &ss[i],nil
+			return &ss[i], nil
 		}
 	}
-	return nil,fmt.Errorf("没有这个ID %v",id)
+	return nil, fmt.Errorf("没有这个ID %v", id)
 }
 
 func (s Student) Average() float32 {
 	var result float32
-	for _,grade := range s.Grades {
+	for _, grade := range s.Grades {
 		result += grade.Score
 	}
 	return result / float32(len(s.Grades))
@@ -45,6 +45,6 @@ const (
 
 type Grade struct {
 	Title string
-	Type GradeType
+	Type  GradeType
 	Score float32
 }

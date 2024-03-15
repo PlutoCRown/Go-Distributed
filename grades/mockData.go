@@ -1,25 +1,25 @@
 package grades
 
 func init() {
-	students =  []Student {
+	students = []Student{
 		{
-			ID:1,
+			ID:        1,
 			FirstName: "A",
-			LastName: "AC",
+			LastName:  "AC",
 			Grades: []Grade{
 				{
 					Title: "Quiz1",
-					Type: GradeQuiz,
+					Type:  GradeQuiz,
 					Score: 85,
 				},
 				{
 					Title: "X",
-					Type: GradeExam,
+					Type:  GradeExam,
 					Score: 80,
 				},
 				{
 					Title: "Test",
-					Type: GradeTest,
+					Type:  GradeTest,
 					Score: 90,
 				},
 			},
