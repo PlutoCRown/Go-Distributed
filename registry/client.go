@@ -12,10 +12,19 @@ import (
 )
 
 func RegisterService(r Registeration) error {
+	heartbeatURL, err := url.Parse(r.HeartbeatURL)
+	if err != nil {
+		return err
+	}
+	http.HandleFunc(heartbeatURL.Path, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
 	serviceUpdateURL, err := url.Parse(r.ServiceUpdateURL)
 	if err != nil {
 		return err
 	}
+	// 任何一个服务上线，都给他加上更新的通知
 	http.Handle(serviceUpdateURL.Path, &serviceUpdateHandler{})
 
 	buf := new(bytes.Buffer)
@@ -40,6 +49,7 @@ func RegisterService(r Registeration) error {
 type serviceUpdateHandler struct {
 }
 
+// 每个服务都会handle这个函数
 func (shu *serviceUpdateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
