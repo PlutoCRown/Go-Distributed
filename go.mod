@@ -1,4 +1,4 @@
-module Plt
+module go-distuibuted
 
 go 1.21.4
 

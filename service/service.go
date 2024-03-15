@@ -1,9 +1,9 @@
 package service
 
 import (
-	"Plt/registry"
 	"context"
 	"fmt"
+	"go-distuibuted/registry"
 	"log"
 	"net/http"
 )

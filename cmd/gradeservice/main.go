@@ -2,11 +2,11 @@ package main
 
 import (
 	// 导入自己项目的package
-	"Plt/log"
-	"Plt/registry"
-	"Plt/service"
 	"context"
 	"fmt"
+	"go-distuibuted/log"
+	"go-distuibuted/registry"
+	"go-distuibuted/service"
 	stlog "log"
 )
 
@@ -22,8 +22,10 @@ func main() {
 	r := registry.Registeration {
 		ServiceName: "Grade Service",
 		ServiceURL: serviceAddress,
+		RequiredService: []registry.ServiceName{registry.LogService},
+		ServiceUpdateURL: serviceAddress + "/services",
 	}
-	ctx,err := service.Start(
+	ctx, err := service.Start(
 		context.Background(),
 		host,
 		port,
@@ -35,6 +37,12 @@ func main() {
 	if err != nil {
 		stlog.Fatalln(err)
 	}
+
+	if logProvider, err := registry.GetProvider(registry.LogService); err != nil {
+		fmt.Printf("Logging service at: %v", logProvider)
+		log.SetClientLogger(logProvider,r.ServiceName)
+	}
+
 	<- ctx.Done()
 	fmt.Println("ShutDown")
 }

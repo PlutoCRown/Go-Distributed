@@ -25,7 +25,7 @@ func (fl fileLog) Write(data []byte) (int,error) {
 // cmd will call this func
 func Run(destination string) {
 	// 转换为这个自己的类型，就相当于重写了这个Write的方法
-	log = stlog.New(fileLog(destination),"go ",stlog.LstdFlags)
+	log = stlog.New(fileLog(destination),"[go] - ",stlog.LstdFlags)
 }
 
 func write(message string) {
