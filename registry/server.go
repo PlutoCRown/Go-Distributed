@@ -2,6 +2,8 @@ package registry
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"sync"
@@ -22,14 +24,16 @@ func (r *registry) add(reg Registeration) error {
 	return nil
 }
 
-func(r *registry) remove(reg Registeration) error {
-	r.mutex.Lock()
-	// for( i in r.registerations) {
-
-	// }
-	// r.registerations = append(r.registerations[:i],r.registerations[i+1]...)
-	r.mutex.Unlock()
-	return  nil
+func(r *registry) remove(url string) error {
+	for i := range reg.registerations {
+		if reg.registerations[i].ServiceURL == url {
+			r.mutex.Lock()
+			r.registerations = append(r.registerations[:i],r.registerations[i+1:]... )
+			r.mutex.Unlock()
+			return nil
+		}
+	}
+	return fmt.Errorf("找不到服务 %v",url)
 }
 
 // already init
@@ -58,24 +62,25 @@ func (s RegistryService) ServeHTTP(w http.ResponseWriter,r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+		
 	case http.MethodDelete:
-		dec := json.NewDecoder(r.Body)
-		var r Registeration
-		err := dec.Decode(&r)
+		payload,err := io.ReadAll(r.Body)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		url := string(payload)
+		log.Printf("Removing %v", url)
+		err = reg.remove(url)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		log.Printf("移除服务 %v 在 %v", r.ServiceName,r.ServiceURL)
-		err = reg.remove(r)
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		default:
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
+		return
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
 	}
 }
